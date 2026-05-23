@@ -181,13 +181,15 @@ class ProductModel
 
     public function searchProducts($keyword)
     {
-        $query = "SELECT p.*, c.name as category_name, u.name as seller_name
+        $query = "SELECT p.*, c.name as category_name, u.name as seller_name, s.name as shop_name
         FROM " . $this->table_name . " p
         LEFT JOIN category c ON p.category_id = c.id
         LEFT JOIN user u ON p.user_id = u.id
+        LEFT JOIN shops s ON p.user_id = s.seller_id
         WHERE p.name LIKE :keyword 
            OR p.description LIKE :keyword 
-           OR c.name LIKE :keyword";
+           OR c.name LIKE :keyword
+           OR s.name LIKE :keyword";
         $stmt = $this->conn->prepare($query);
         $searchKeyword = "%{$keyword}%";
         $stmt->bindParam(':keyword', $searchKeyword);
@@ -197,12 +199,14 @@ class ProductModel
 
     public function searchProductsFiltered($keyword, $minPrice = null, $maxPrice = null, $user_id = null, $sort = 'newest')
     {
-        $query = "SELECT p.*, c.name as category_name
+        $query = "SELECT p.*, c.name as category_name, s.name as shop_name
         FROM " . $this->table_name . " p
         LEFT JOIN category c ON p.category_id = c.id
+        LEFT JOIN shops s ON p.user_id = s.seller_id
         WHERE (p.name LIKE :keyword1 
            OR p.description LIKE :keyword2 
-           OR c.name LIKE :keyword3)
+           OR c.name LIKE :keyword3
+           OR s.name LIKE :keyword4)
            AND p.status = 'approved'";
 
         if ($minPrice !== null) {
@@ -237,6 +241,7 @@ class ProductModel
         $stmt->bindParam(':keyword1', $searchKeyword);
         $stmt->bindParam(':keyword2', $searchKeyword);
         $stmt->bindParam(':keyword3', $searchKeyword);
+        $stmt->bindParam(':keyword4', $searchKeyword);
 
         if ($minPrice !== null) {
             $stmt->bindParam(':minPrice', $minPrice);

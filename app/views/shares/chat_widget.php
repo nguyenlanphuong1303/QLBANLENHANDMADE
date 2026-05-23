@@ -17,6 +17,7 @@ $shopAvatar = BASE_URL . 'public/images/logolen.jpg';
         <div class="wgt-floating-btn" id="wgtBubble" title="Chat với shop">
             <i class="fab fa-facebook-messenger fa-lg"></i>
             <span class="wgt-bubble-badge" id="wgtBadge">0</span>
+            
         </div>
 
         <!-- Window -->

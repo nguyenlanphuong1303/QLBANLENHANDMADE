@@ -49,7 +49,7 @@ include 'app/views/dashboard/header.php';
                             </tr>
                         <?php else: ?>
                             <?php foreach ($products as $product): ?>
-                                <tr>
+                                <tr id="row-<?php echo $product->id; ?>">
                                     <td><?php echo $product->id; ?></td>
                                     <td>
                                         <?php 
@@ -77,7 +77,7 @@ include 'app/views/dashboard/header.php';
                                             <a href="#" class="btn btn-danger btn-sm btn-reject" data-id="<?php echo $product->id; ?>">
                                                 <i class="fas fa-times"></i> Từ chối
                                             </a>
-                                            <a href="<?php echo BASE_URL; ?>index.php?url=Product/show/<?php echo $product->id; ?>" target="_blank" class="btn btn-info btn-sm">
+                                            <a href="<?php echo BASE_URL; ?>index.php?url=Dashboard/pendingProducts/pin/<?php echo $product->id; ?>" class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i> Xem
                                             </a>
                                         </div>

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.4.3 - MySQL Community Server - GPL
+-- Server version:               8.0.30 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.8.0.6908
+-- HeidiSQL Version:             12.1.0.6537
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -48,7 +48,7 @@ INSERT INTO `addresses` (`id`, `user_id`, `name`, `phone`, `email`, `city`, `dis
 -- Dumping structure for table handmade_shop.admin_revenue
 CREATE TABLE IF NOT EXISTS `admin_revenue` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `transaction_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã giao dịch duy nhất',
+  `transaction_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã giao dịch duy nhất',
   `order_id` int NOT NULL COMMENT 'FK → orders.id',
   `order_detail_id` int NOT NULL COMMENT 'FK → order_detail.id',
   `seller_id` int NOT NULL COMMENT 'FK → user.id (seller)',
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS `admin_revenue` (
   `commission_percent` decimal(5,2) NOT NULL DEFAULT '10.00' COMMENT 'Tỷ lệ hoa hồng',
   `admin_fee` decimal(12,2) NOT NULL COMMENT 'Số tiền admin nhận (10%)',
   `seller_receive` decimal(12,2) NOT NULL COMMENT 'Số tiền seller nhận (90%)',
-  `status` enum('pending','settled','refunded') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'settled',
-  `note` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('pending','settled','refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'settled',
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_rev_txn_code` (`transaction_code`),
@@ -68,11 +68,12 @@ CREATE TABLE IF NOT EXISTS `admin_revenue` (
   CONSTRAINT `fk_rev_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `fk_rev_order_detail` FOREIGN KEY (`order_detail_id`) REFERENCES `order_detail` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_rev_seller` FOREIGN KEY (`seller_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Doanh thu hoa hồng của admin từ mỗi mặt hàng hoàn thành';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Doanh thu hoa hồng của admin từ mỗi mặt hàng hoàn thành';
 
--- Dumping data for table handmade_shop.admin_revenue: ~0 rows (approximately)
+-- Dumping data for table handmade_shop.admin_revenue: ~2 rows (approximately)
 INSERT INTO `admin_revenue` (`id`, `transaction_code`, `order_id`, `order_detail_id`, `seller_id`, `gross_amount`, `commission_percent`, `admin_fee`, `seller_receive`, `status`, `note`, `created_at`) VALUES
-	(1, 'REV-20260518-80908-40', 35, 40, 18, 55555.00, 10.00, 5555.50, 49999.50, 'settled', 'Phí hoa hồng 10% từ sản phẩm #47 (đơn hàng #35)', '2026-05-18 11:07:51');
+	(1, 'REV-20260518-80908-40', 35, 40, 18, 55555.00, 10.00, 5555.50, 49999.50, 'settled', 'Phí hoa hồng 10% từ sản phẩm #47 (đơn hàng #35)', '2026-05-18 11:07:51'),
+	(2, 'REV-20260520-71529-42', 37, 42, 11, 30000.00, 10.00, 3000.00, 27000.00, 'settled', 'Phí hoa hồng 10% từ sản phẩm #50 (đơn hàng #37)', '2026-05-20 17:08:23');
 
 -- Dumping structure for table handmade_shop.banners
 CREATE TABLE IF NOT EXISTS `banners` (
@@ -101,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `cart_items` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_product_variant` (`user_id`,`product_id`,`variant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table handmade_shop.cart_items: ~7 rows (approximately)
 INSERT INTO `cart_items` (`id`, `user_id`, `product_id`, `variant_id`, `quantity`, `updated_at`) VALUES
@@ -152,9 +153,9 @@ CREATE TABLE IF NOT EXISTS `chat_messages` (
   `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.chat_messages: ~111 rows (approximately)
+-- Dumping data for table handmade_shop.chat_messages: ~117 rows (approximately)
 INSERT INTO `chat_messages` (`id`, `conversation_id`, `sender_id`, `message_type`, `content`, `attachment_url`, `is_read`, `created_at`) VALUES
 	(1, 1, 3, 'text', 'e', NULL, 1, '2026-04-30 10:01:47'),
 	(2, 1, 3, 'text', 'r', NULL, 1, '2026-04-30 10:01:52'),
@@ -265,8 +266,14 @@ INSERT INTO `chat_messages` (`id`, `conversation_id`, `sender_id`, `message_type
 	(147, 20, 18, 'text', 'alo', NULL, 1, '2026-05-14 06:21:34'),
 	(148, 21, 18, 'text', '.', NULL, 1, '2026-05-14 06:22:51'),
 	(149, 20, 3, 'text', 'sao', NULL, 1, '2026-05-14 06:27:35'),
-	(150, 21, 18, 'product', '{"id":27,"name":"Hoa hồng đơn","price":"75.000₫","image":"public/uploads/prod_69e702664c008_1776747110.jpg"}', NULL, 0, '2026-05-18 02:16:16'),
-	(151, 21, 18, 'text', 'hahaa', NULL, 0, '2026-05-18 02:16:20');
+	(150, 21, 18, 'product', '{"id":27,"name":"Hoa hồng đơn","price":"75.000₫","image":"public/uploads/prod_69e702664c008_1776747110.jpg"}', NULL, 1, '2026-05-18 02:16:16'),
+	(151, 21, 18, 'text', 'hahaa', NULL, 1, '2026-05-18 02:16:20'),
+	(152, 18, 20, 'text', 'hi', NULL, 1, '2026-05-20 06:44:47'),
+	(153, 18, 20, 'text', 'có bán mèo hong dạ', NULL, 1, '2026-05-20 06:45:09'),
+	(154, 18, 5, 'text', 'hong', NULL, 1, '2026-05-20 06:45:31'),
+	(155, 18, 20, 'text', '.', NULL, 1, '2026-05-20 06:54:22'),
+	(156, 18, 5, 'text', 'hihi', NULL, 1, '2026-05-20 06:56:26'),
+	(157, 16, 11, 'text', 'hé lô, này bán sao', NULL, 0, '2026-05-20 10:07:26');
 
 -- Dumping structure for table handmade_shop.conversations
 CREATE TABLE IF NOT EXISTS `conversations` (
@@ -298,9 +305,9 @@ INSERT INTO `conversations` (`id`, `customer_id`, `seller_id`, `last_message`, `
 	(11, 19, 3, 'Msg 3', 'text', '2026-05-13 13:49:57', 0, 0, 0, 0, '2026-05-13 06:17:37', '2026-05-13 06:49:57', NULL),
 	(12, 19, 6, '[product]', 'product', '2026-05-13 13:26:31', 0, 0, 0, 0, '2026-05-13 06:26:30', '2026-05-13 06:26:31', NULL),
 	(14, 7, 3, '[product]', 'product', '2026-05-13 16:40:57', 0, 0, 0, 0, '2026-05-13 09:20:00', '2026-05-13 09:40:57', NULL),
-	(16, 11, 0, 'kkk', 'text', '2026-05-13 20:07:51', 0, 0, 0, 0, '2026-05-13 13:07:46', '2026-05-13 13:07:51', NULL),
+	(16, 11, 0, 'hé lô, này bán sao', 'text', '2026-05-20 17:07:26', 0, 0, 0, 0, '2026-05-13 13:07:46', '2026-05-20 10:07:26', NULL),
 	(17, 20, 0, NULL, 'text', NULL, 0, 0, 0, 0, '2026-05-13 14:16:26', '2026-05-13 14:16:26', NULL),
-	(18, 20, 3, NULL, 'text', NULL, 0, 0, 0, 0, '2026-05-13 14:16:26', '2026-05-13 14:16:26', NULL),
+	(18, 20, 3, 'hihi', 'text', '2026-05-20 13:56:26', 0, 0, 0, 0, '2026-05-13 14:16:26', '2026-05-20 06:56:26', NULL),
 	(20, 18, 0, 'sao', 'text', '2026-05-14 13:27:35', 0, 0, 0, 0, '2026-05-14 06:21:30', '2026-05-14 06:27:35', NULL),
 	(21, 18, 5, 'hahaa', 'text', '2026-05-18 09:16:20', 0, 0, 0, 0, '2026-05-14 06:22:48', '2026-05-18 02:16:20', NULL);
 
@@ -315,9 +322,9 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.notifications: ~61 rows (approximately)
+-- Dumping data for table handmade_shop.notifications: ~77 rows (approximately)
 INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `type`, `link`, `is_read`, `created_at`) VALUES
 	(1, 3, NULL, 'Có đơn đặt hàng mới #28 trị giá 59.100 đ', 'system', 'index.php?url=Dashboard/orders', 1, '2026-04-30 07:42:01'),
 	(2, 5, NULL, 'Có đơn đặt hàng mới #28 trị giá 59.100 đ', 'system', 'index.php?url=Dashboard/orders', 0, '2026-04-30 07:42:01'),
@@ -382,7 +389,20 @@ INSERT INTO `notifications` (`id`, `user_id`, `title`, `message`, `type`, `link`
 	(61, 5, 'Yêu cầu phân quyền Seller', 'Người dùng Khánh Hân muốn trở thành người bán (Seller).', 'seller_request', 'index.php?url=Admin/manageSellers', 0, '2026-05-14 07:58:38'),
 	(62, 3, 'Đơn hàng mới', 'Có đơn đặt hàng mới #35 trị giá 85.555 đ', 'order', 'index.php?url=Dashboard/orderDetail/35', 1, '2026-05-18 04:07:42'),
 	(63, 5, 'Đơn hàng mới', 'Có đơn đặt hàng mới #35 trị giá 85.555 đ', 'order', 'index.php?url=Dashboard/orderDetail/35', 0, '2026-05-18 04:07:42'),
-	(64, 3, 'Thông báo hệ thống', 'Đơn hàng #35 của bạn đã được cập nhật thành: Đã giao thành công', 'system', 'index.php?url=Page/orders', 0, '2026-05-18 04:07:51');
+	(64, 3, 'Thông báo hệ thống', 'Đơn hàng #35 của bạn đã được cập nhật thành: Đã giao thành công', 'system', 'index.php?url=Page/orders', 0, '2026-05-18 04:07:51'),
+	(65, 1, 'Thông báo hệ thống', 'Sản phẩm mới \'Gấu bông len handmade nhỏ xinh\' từ người bán đang chờ phê duyệt.', 'system', 'index.php?url=Dashboard/products', 0, '2026-05-20 07:18:38'),
+	(66, 1, 'Thông báo hệ thống', 'Sản phẩm mới \'Móc khoá mèo chột len\' từ người bán đang chờ phê duyệt.', 'system', 'index.php?url=Dashboard/products', 0, '2026-05-20 07:21:27'),
+	(67, 3, 'Đơn hàng mới', 'Có đơn đặt hàng mới #36 trị giá 104.000 đ', 'order', 'index.php?url=Dashboard/orderDetail/36', 0, '2026-05-20 07:31:18'),
+	(68, 5, 'Đơn hàng mới', 'Có đơn đặt hàng mới #36 trị giá 104.000 đ', 'order', 'index.php?url=Dashboard/orderDetail/36', 1, '2026-05-20 07:31:18'),
+	(69, 11, 'Yêu cầu chỉnh sửa sản phẩm', 'Sản phẩm \'Móc khoá mèo chột len\' cần được chỉnh sửa: thêm mô tả chỉ tiết', 'warning', 'index.php?url=Product/edit/49', 1, '2026-05-20 08:37:07'),
+	(70, 3, 'Yêu cầu cập nhật thông tin Shop', 'Cửa hàng Nguyễn Huỳnh Minh Thư Shop yêu cầu cập nhật thông tin.', 'shop_update', 'index.php?url=Dashboard/shopUpdates', 0, '2026-05-20 09:13:11'),
+	(71, 5, 'Yêu cầu cập nhật thông tin Shop', 'Cửa hàng Nguyễn Huỳnh Minh Thư Shop yêu cầu cập nhật thông tin.', 'shop_update', 'index.php?url=Dashboard/shopUpdates', 0, '2026-05-20 09:13:11'),
+	(72, 3, 'Yêu cầu cập nhật thông tin Shop', 'Cửa hàng Nguyễn Huỳnh Minh Thư Shop yêu cầu cập nhật thông tin.', 'shop_update', 'index.php?url=Dashboard/shopUpdates', 0, '2026-05-20 09:21:39'),
+	(73, 5, 'Yêu cầu cập nhật thông tin Shop', 'Cửa hàng Nguyễn Huỳnh Minh Thư Shop yêu cầu cập nhật thông tin.', 'shop_update', 'index.php?url=Dashboard/shopUpdates', 1, '2026-05-20 09:21:39'),
+	(74, 1, 'Thông báo hệ thống', 'Sản phẩm mới \'Móc khoá mèo chột len\' từ người bán đang chờ phê duyệt.', 'system', 'index.php?url=Dashboard/products', 0, '2026-05-20 09:37:39'),
+	(75, 5, 'Thông báo hệ thống', 'Đơn hàng #36 của bạn đã được cập nhật thành: Đã hủy', 'system', 'index.php?url=Page/orders', 0, '2026-05-20 09:38:26'),
+	(76, 3, 'Đơn hàng mới', 'Có đơn đặt hàng mới #37 trị giá 75.000 đ', 'order', 'index.php?url=Dashboard/orderDetail/37', 0, '2026-05-20 10:03:01'),
+	(77, 5, 'Đơn hàng mới', 'Có đơn đặt hàng mới #37 trị giá 75.000 đ', 'order', 'index.php?url=Dashboard/orderDetail/37', 0, '2026-05-20 10:03:01');
 
 -- Dumping structure for table handmade_shop.orders
 CREATE TABLE IF NOT EXISTS `orders` (
@@ -402,9 +422,9 @@ CREATE TABLE IF NOT EXISTS `orders` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.orders: ~30 rows (approximately)
+-- Dumping data for table handmade_shop.orders: ~33 rows (approximately)
 INSERT INTO `orders` (`id`, `recipient_name`, `recipient_phone`, `recipient_address`, `note`, `user_id`, `total`, `status`, `payment_method`, `shipping_fee`, `commission_settled`, `cancel_reason`, `created_at`) VALUES
 	(1, 'Chu Hoàng Khánh Hân', '0964325348', '34 Tân Lập 1, Phường Tăng Nhơn Phú B, Thành phố Thủ Đức, Thành phố Hồ Chí Minh', NULL, 3, 180000.00, 'completed', 'cod', 0.00, 0, 'Tôi muốn cập nhật địa chỉ/sđt nhận hàng.', '2026-03-21 05:22:12'),
 	(2, 'Nguyễn Lan Phương', '0382613031', '60/6, Trương Thị Khét, Xã Phước Thạnh, Huyện Củ Chi, Thành phố Hồ Chí Minh', NULL, 5, 2660000.00, 'completed', 'cod', 0.00, 0, NULL, '2026-03-24 04:11:20'),
@@ -436,7 +456,9 @@ INSERT INTO `orders` (`id`, `recipient_name`, `recipient_phone`, `recipient_addr
 	(32, 'Chu Hoàng Khánh Hân', '0964325348', '34 Tân lập 1, Phường Tăng Nhơn Phú B, Thành phố Thủ Đức, Thành phố Hồ Chí Minh', '', 3, 97500.00, 'completed', 'cod', 30000.00, 0, NULL, '2026-05-09 08:09:19'),
 	(33, 'Chu Hoàng Khánh Hân', '0964325348', '34 Tân lập 1, Phường Tăng Nhơn Phú B, Thành phố Thủ Đức, Thành phố Hồ Chí Minh', '', 3, 78500.00, 'completed', 'cod', 30000.00, 0, NULL, '2026-05-09 08:10:30'),
 	(34, 'Chu Hoàng Khánh Hân', '0964325348', '34 Tân lập 1, Phường Tăng Nhơn Phú B, Thành phố Thủ Đức, Thành phố Hồ Chí Minh', '', 3, 251100.00, 'completed', 'cod', 30000.00, 0, NULL, '2026-05-13 05:51:22'),
-	(35, 'Chu Hoàng Khánh Hân', '0964325348', '34 Tân lập 1, Phường Tăng Nhơn Phú B, Thành phố Thủ Đức, Thành phố Hồ Chí Minh', '', 3, 85555.00, 'completed', 'cod', 30000.00, 1, NULL, '2026-05-18 04:07:42');
+	(35, 'Chu Hoàng Khánh Hân', '0964325348', '34 Tân lập 1, Phường Tăng Nhơn Phú B, Thành phố Thủ Đức, Thành phố Hồ Chí Minh', '', 3, 85555.00, 'completed', 'cod', 30000.00, 1, NULL, '2026-05-18 04:07:42'),
+	(36, 'Nguyễn Lan Phương', '0382613031', '60/6, Trương Thị Khét, Xã Phước Thạnh, Huyện Củ Chi, Thành phố Hồ Chí Minh', '', 5, 104000.00, 'cancelled', 'cod', 45000.00, 0, NULL, '2026-05-20 07:31:18'),
+	(37, 'Nguyễn Lan Phương', '0382613031', '60/6, Trương Thị Khét, Xã Phước Thạnh, Huyện Củ Chi, Thành phố Hồ Chí Minh', '', 5, 75000.00, 'completed', 'cod', 45000.00, 1, NULL, '2026-05-20 10:03:01');
 
 -- Dumping structure for table handmade_shop.order_detail
 CREATE TABLE IF NOT EXISTS `order_detail` (
@@ -455,9 +477,9 @@ CREATE TABLE IF NOT EXISTS `order_detail` (
   KEY `product_id` (`product_id`),
   CONSTRAINT `order_detail_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `order_detail_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.order_detail: ~39 rows (approximately)
+-- Dumping data for table handmade_shop.order_detail: ~41 rows (approximately)
 INSERT INTO `order_detail` (`id`, `order_id`, `product_id`, `variant_id`, `quantity`, `price`, `commission_percent`, `admin_fee`, `seller_receive`, `commission_settled`) VALUES
 	(1, 1, 1, 0, 1, 180000.00, 10.00, 0.00, 0.00, 0),
 	(2, 2, 1, 0, 12, 180000.00, 10.00, 0.00, 0.00, 0),
@@ -498,7 +520,8 @@ INSERT INTO `order_detail` (`id`, `order_id`, `product_id`, `variant_id`, `quant
 	(37, 33, 44, 0, 1, 48500.00, 10.00, 0.00, 0.00, 0),
 	(38, 34, 39, 0, 1, 29100.00, 10.00, 0.00, 0.00, 0),
 	(39, 34, 40, 0, 5, 38400.00, 10.00, 0.00, 0.00, 0),
-	(40, 35, 47, 0, 1, 55555.00, 10.00, 5555.50, 49999.50, 1);
+	(40, 35, 47, 0, 1, 55555.00, 10.00, 5555.50, 49999.50, 1),
+	(42, 37, 50, 15, 1, 30000.00, 10.00, 3000.00, 27000.00, 1);
 
 -- Dumping structure for table handmade_shop.password_resets
 CREATE TABLE IF NOT EXISTS `password_resets` (
@@ -511,7 +534,7 @@ CREATE TABLE IF NOT EXISTS `password_resets` (
   KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.password_resets: ~0 rows (approximately)
+-- Dumping data for table handmade_shop.password_resets: ~1 rows (approximately)
 INSERT INTO `password_resets` (`id`, `email`, `otp_code`, `expires_at`, `created_at`) VALUES
 	(1, 'hankhanh0901@gmail.com', '537854', '2026-05-12 04:42:23', '2026-05-12 04:37:23');
 
@@ -539,9 +562,9 @@ CREATE TABLE IF NOT EXISTS `product` (
   PRIMARY KEY (`id`),
   KEY `category_id` (`category_id`),
   CONSTRAINT `product_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.product: ~43 rows (approximately)
+-- Dumping data for table handmade_shop.product: ~44 rows (approximately)
 INSERT INTO `product` (`id`, `name`, `description`, `price`, `image`, `stock`, `category_id`, `sold`, `rating`, `rating_count`, `is_featured`, `display_order`, `discount_percent`, `location`, `user_id`, `status`, `created_at`, `rejection_reason`, `likes`) VALUES
 	(1, 'Lục Lạc Vòng Gỗ Handmade đồ chơi an toàn cho Bé', 'chiều cao 10cm\r\nchất liệu từ sợi cotton cao cấp, bền đẹp và an toàn cho bé,\r\nbên trong nhồi bông gòn nhân tạo không gây dị ứng cho bé yêu\r\nMắt được khâu thủ công đảm bảo an toàn', 180000.00, 'luc-lac-vong-go-handmade-do-choi-an-toan-cho-be-11-510x383.jpg', 0, 4, 5, 4.0, 1, 0, 0, 0, 'Tp. Hồ Chí Minh', 5, 'approved', '2026-04-30 06:38:36', NULL, 0),
 	(2, 'Búp bê handmade Autumn', 'chiều cao 30cm\r\nchất liệu từ sợi cotton cao cấp, bền đẹp và an toàn cho bé, không gây dị ứng cho bé yêu\r\nmắt búp bê bằng nhựa, được gắn chốt, đẹp bền và an toàn cho bé trong quá trình sử dụng\r\nváy áo và mũ cũng được làm thủ công có thể tháo rời cho các tự do thay đổi', 400000.00, '61340911_1261004000732867_6425604364278169600_n-510x510.jpg', 0, 4, 1, 0.0, 0, 0, 0, 0, 'Tp. Hồ Chí Minh', 5, 'approved', '2026-04-30 06:38:36', NULL, 0),
@@ -585,7 +608,8 @@ INSERT INTO `product` (`id`, `name`, `description`, `price`, `image`, `stock`, `
 	(43, 'Len Milk Cotton 2mm 50g', '', 15000.00, 'prod_69f318ceaba30_1777539278.jpg', 5, 12, 0, 5.0, 0, 0, 0, 0, 'Tp. Hồ Chí Minh', 5, 'approved', '2026-04-30 08:54:38', NULL, 1),
 	(44, 'Len sợi Acrylic Paintbox Yarns Simply DK', 'so beautiful', 50000.00, 'prod_69fee9beb3cbf_1778313662.jpg', 6, 13, 1, 5.0, 0, 0, 0, 6, 'Tp. Hồ Chí Minh', 5, 'approved', '2026-05-09 08:01:02', NULL, 0),
 	(45, ' lấy trễ hơn giù', 'ss', 65555.00, 'prod_69feee72bc994_1778314866.jpg', 6, 13, 0, 5.0, 0, 0, 0, 2, 'Tp. Hồ Chí Minh', 5, 'rejected', '2026-05-09 08:21:06', 'no', 0),
-	(47, 'Lục Lạc Vòng Gỗ ', 'd', 55555.00, 'prod_6a05503a952d0_1778733114.jpg', 1, 13, 1, 5.0, 0, 0, 0, 0, 'Tp. Hồ Chí Minh', 18, 'pending', '2026-05-14 03:57:42', NULL, 0);
+	(47, 'Lục Lạc Vòng Gỗ ', 'd', 55555.00, 'prod_6a05503a952d0_1778733114.jpg', 1, 13, 1, 5.0, 0, 0, 0, 0, 'Tp. Hồ Chí Minh', 18, 'pending', '2026-05-14 03:57:42', NULL, 0),
+	(50, 'Móc khoá mèo chột len', '', 30000.00, 'prod_6a0d80e3a7da3_1779269859.png', 53, 15, 2, 0.0, 0, 0, 0, 0, 'Tp. Hồ Chí Minh', 11, 'approved', '2026-05-20 09:37:39', NULL, 0);
 
 -- Dumping structure for table handmade_shop.product_likes
 CREATE TABLE IF NOT EXISTS `product_likes` (
@@ -646,9 +670,9 @@ CREATE TABLE IF NOT EXISTS `product_variants` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.product_variants: ~10 rows (approximately)
+-- Dumping data for table handmade_shop.product_variants: ~13 rows (approximately)
 INSERT INTO `product_variants` (`id`, `product_id`, `name`, `image`, `price`, `stock`, `created_at`) VALUES
 	(1, 1, 'Bunny', 'luc-lac-vong-go-handmade-do-choi-an-toan-cho-be-4-1.jpg', 0.00, 0, '2026-04-10 12:14:27'),
 	(2, 26, 'Hoa hồng trắng', 'prod_69de5b9baa940_1776180123.jpg', 0.00, 0, '2026-04-14 15:22:03'),
@@ -659,7 +683,10 @@ INSERT INTO `product_variants` (`id`, `product_id`, `name`, `image`, `price`, `s
 	(7, 35, 'Hoa xanh', 'prod_69e6ff9359898_1776746387.png', 40000.00, 6, '2026-04-21 04:39:47'),
 	(8, 35, 'Ong', 'prod_69e7007d39dc2_1776746621.jpg', 40000.00, 9, '2026-04-21 04:43:41'),
 	(9, 36, 'Vàng nhạt', 'prod_69e7317f283ff_1776759167.png', 25000.00, 9, '2026-04-21 08:12:47'),
-	(10, 36, 'Nâu ', 'prod_69e7317f298ec_1776759167.png', 25000.00, 14, '2026-04-21 08:12:47');
+	(10, 36, 'Nâu ', 'prod_69e7317f298ec_1776759167.png', 25000.00, 14, '2026-04-21 08:12:47'),
+	(15, 50, 'Mèo đen', '', 30000.00, 51, '2026-05-20 09:37:39'),
+	(16, 50, 'Mèo trắng', '', 30000.00, 33, '2026-05-20 09:37:39'),
+	(17, 50, 'Cả 2', 'prod_6a0d80e3ac894_1779269859.png', 59000.00, 57, '2026-05-20 09:37:39');
 
 -- Dumping structure for table handmade_shop.returns
 CREATE TABLE IF NOT EXISTS `returns` (
@@ -738,7 +765,7 @@ CREATE TABLE IF NOT EXISTS `return_media` (
   CONSTRAINT `return_media_ibfk_1` FOREIGN KEY (`return_id`) REFERENCES `returns` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.return_media: ~0 rows (approximately)
+-- Dumping data for table handmade_shop.return_media: ~1 rows (approximately)
 INSERT INTO `return_media` (`id`, `return_id`, `file_path`, `file_type`, `created_at`) VALUES
 	(1, 1, 'public/uploads/returns/return_1_0_1777536342.jpg', 'image', '2026-04-30 08:05:42');
 
@@ -778,11 +805,12 @@ CREATE TABLE IF NOT EXISTS `seller_wallets` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_seller_wallet` (`seller_id`),
   CONSTRAINT `fk_wallet_seller` FOREIGN KEY (`seller_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Ví điện tử của từng seller';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Ví điện tử của từng seller';
 
--- Dumping data for table handmade_shop.seller_wallets: ~0 rows (approximately)
+-- Dumping data for table handmade_shop.seller_wallets: ~2 rows (approximately)
 INSERT INTO `seller_wallets` (`id`, `seller_id`, `balance`, `total_earned`, `total_withdrawn`, `created_at`, `updated_at`) VALUES
-	(1, 18, 49999.50, 49999.50, 0.00, '2026-05-18 10:58:23', '2026-05-18 11:07:51');
+	(1, 18, 49999.50, 49999.50, 0.00, '2026-05-18 10:58:23', '2026-05-18 11:07:51'),
+	(2, 11, 27000.00, 27000.00, 0.00, '2026-05-20 14:21:39', '2026-05-20 17:08:23');
 
 -- Dumping structure for table handmade_shop.shops
 CREATE TABLE IF NOT EXISTS `shops` (
@@ -798,12 +826,13 @@ CREATE TABLE IF NOT EXISTS `shops` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `seller_id` (`seller_id`),
   CONSTRAINT `shops_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.shops: ~2 rows (approximately)
+-- Dumping data for table handmade_shop.shops: ~3 rows (approximately)
 INSERT INTO `shops` (`id`, `seller_id`, `name`, `description`, `logo`, `banner`, `rating`, `status`, `created_at`) VALUES
 	(1, 18, 'Han Shoppp', 'hehehehehehehe\r\n', 'public/uploads/shops/1778667100_logo_z7772722283309_3c577827e8f56be8ad43f7b5d04768fb.jpg', NULL, 0, 'active', '2026-05-09 07:56:02'),
-	(2, 5, 'Nguyễn Lan Phương Shop', 'Cửa hàng chính thức của ban quản trị.', NULL, NULL, 0, 'active', '2026-05-14 04:29:25');
+	(2, 5, 'Nguyễn Lan Phương Shop', 'Cửa hàng chính thức của ban quản trị.', NULL, NULL, 0, 'active', '2026-05-14 04:29:25'),
+	(3, 11, 'Nguyễn Huỳnh Minh Thư Shop', 'Cửa hàng của Nguyễn Huỳnh Minh Thư', NULL, NULL, 0, 'active', '2026-05-20 09:05:07');
 
 -- Dumping structure for table handmade_shop.shop_followers
 CREATE TABLE IF NOT EXISTS `shop_followers` (
@@ -833,15 +862,16 @@ CREATE TABLE IF NOT EXISTS `shop_update_requests` (
   PRIMARY KEY (`id`),
   KEY `shop_id` (`shop_id`),
   CONSTRAINT `shop_update_requests_ibfk_1` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table handmade_shop.shop_update_requests: ~5 rows (approximately)
+-- Dumping data for table handmade_shop.shop_update_requests: ~6 rows (approximately)
 INSERT INTO `shop_update_requests` (`id`, `shop_id`, `new_name`, `new_description`, `new_logo`, `new_banner`, `status`, `created_at`) VALUES
 	(1, 1, 'Han Shop', 'hehe', NULL, NULL, 'approved', '2026-05-13 10:10:56'),
 	(2, 1, 'Han Shop', 'hehe', 'public/uploads/shops/1778667100_logo_z7772722283309_3c577827e8f56be8ad43f7b5d04768fb.jpg', NULL, 'approved', '2026-05-13 10:11:40'),
 	(3, 1, 'Han Shop', 'hehe', 'public/uploads/shops/1778667100_logo_z7772722283309_3c577827e8f56be8ad43f7b5d04768fb.jpg', NULL, 'approved', '2026-05-14 04:02:27'),
 	(4, 1, 'Han Shoppp', 'hehe', 'public/uploads/shops/1778667100_logo_z7772722283309_3c577827e8f56be8ad43f7b5d04768fb.jpg', NULL, 'approved', '2026-05-14 04:37:36'),
-	(5, 1, 'Han Shoppp', 'hehehehehehehe\r\n', 'public/uploads/shops/1778667100_logo_z7772722283309_3c577827e8f56be8ad43f7b5d04768fb.jpg', NULL, 'approved', '2026-05-14 04:53:57');
+	(5, 1, 'Han Shoppp', 'hehehehehehehe\r\n', 'public/uploads/shops/1778667100_logo_z7772722283309_3c577827e8f56be8ad43f7b5d04768fb.jpg', NULL, 'approved', '2026-05-14 04:53:57'),
+	(7, 3, 'phuong shop', 'mại zô mại zo', NULL, NULL, 'pending', '2026-05-20 09:21:39');
 
 -- Dumping structure for table handmade_shop.user
 CREATE TABLE IF NOT EXISTS `user` (
@@ -865,7 +895,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dumping data for table handmade_shop.user: ~17 rows (approximately)
 INSERT INTO `user` (`id`, `name`, `username`, `email`, `password`, `phone`, `address`, `gender`, `dob`, `role`, `bank_name`, `bank_account`, `avatar`) VALUES
 	(3, 'Chu Hoàng Khánh Hân', 'hankhanh0901@gmail.com', 'hankhanh0901@gmail.com', '$2y$10$I2jEvFCw70Z.fcFeqEPp4.tcafRIc8RiB97l38OAJoiXsyfZwUNFS', '0964325348', '', 'nam', '2004-01-09', 'admin', NULL, NULL, 'avatar_3_1776425351.jpg'),
-	(5, 'Nguyễn Lan Phương', 'nguyenphuong2005b@gmail.com', 'nguyenphuong2005b@gmail.com', '$2y$10$NI81lET7vgHTCOZJ9F.EIOB92AyqaGO8pCJ69vSj4AxpDDCqL3WyO', '0382613031', '', 'nu', '2005-03-13', 'admin', NULL, NULL, 'avatar_5_1775829360.jpg'),
+	(5, 'Nguyễn Lan Phương', 'nguyenphuong2005b@gmail.com', 'nguyenphuong2005b@gmail.com', '$2y$10$NI81lET7vgHTCOZJ9F.EIOB92AyqaGO8pCJ69vSj4AxpDDCqL3WyO', '0382613031', '', 'nu', '2005-03-13', 'admin', NULL, NULL, 'avatar_5_1779254574.jpg'),
 	(6, 'Han Khanh', 'hankhanh9124@gmail.com', 'hankhanh9124@gmail.com', '$2y$10$FP0QGWo4vzba.zMHwhq6FeWcKz4tf7b9hjtvQ3m9e2WAcSjFT.IBS', '0964325344', NULL, 'khac', NULL, 'seller', NULL, NULL, NULL),
 	(7, 'Khánh Hân', 'hankhanh', NULL, '$2y$10$seVNssVMurk2j045nNcjyOPtJ1jptOQSmN61F6JQzm58NIaKA/Auq', '0964325331', '', 'nam', '2004-01-09', 'user', NULL, NULL, 'avatar_7_1778650063.jpg'),
 	(8, 'Hân', 'hankhanh09012004@gmail.com', 'hankhanh09012004@gmail.com', '$2y$10$seVNssVMurk2j045nNcjyOPtJ1jptOQSmN61F6JQzm58NIaKA/Auq', '0964325331', '60/49 Phan Chu Trinh , 24817, 673, 68', 'khac', NULL, 'user', NULL, NULL, NULL),
@@ -885,20 +915,20 @@ INSERT INTO `user` (`id`, `name`, `username`, `email`, `password`, `phone`, `add
 -- Dumping structure for table handmade_shop.wallet_transactions
 CREATE TABLE IF NOT EXISTS `wallet_transactions` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `transaction_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã giao dịch duy nhất VD: TXN-20240518-00001',
+  `transaction_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã giao dịch duy nhất VD: TXN-20240518-00001',
   `wallet_id` int NOT NULL COMMENT 'FK → seller_wallets.id',
   `seller_id` int NOT NULL COMMENT 'FK → user.id',
   `order_id` int DEFAULT NULL COMMENT 'FK → orders.id',
   `order_detail_id` int DEFAULT NULL COMMENT 'FK → order_detail.id (NULL nếu là rút tiền)',
-  `type` enum('commission','withdrawal','refund','adjustment') COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Loại giao dịch',
+  `type` enum('commission','withdrawal','refund','adjustment') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Loại giao dịch',
   `gross_amount` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT 'Tổng giá trị mặt hàng (trước khi trừ phí)',
   `commission_percent` decimal(5,2) NOT NULL DEFAULT '10.00' COMMENT 'Tỷ lệ hoa hồng áp dụng',
   `admin_fee` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT 'Số tiền admin nhận',
   `amount` decimal(12,2) NOT NULL COMMENT 'Số tiền thực tế seller nhận/rút',
   `balance_before` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT 'Số dư ví trước giao dịch',
   `balance_after` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT 'Số dư ví sau giao dịch',
-  `note` text COLLATE utf8mb4_unicode_ci COMMENT 'Ghi chú thêm',
-  `status` enum('pending','completed','failed','refunded') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'completed',
+  `note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Ghi chú thêm',
+  `status` enum('pending','completed','failed','refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'completed',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_txn_code` (`transaction_code`),
@@ -911,11 +941,12 @@ CREATE TABLE IF NOT EXISTS `wallet_transactions` (
   CONSTRAINT `fk_txn_order_detail` FOREIGN KEY (`order_detail_id`) REFERENCES `order_detail` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_txn_seller` FOREIGN KEY (`seller_id`) REFERENCES `user` (`id`),
   CONSTRAINT `fk_txn_wallet` FOREIGN KEY (`wallet_id`) REFERENCES `seller_wallets` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Lịch sử giao dịch chi tiết của ví seller';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Lịch sử giao dịch chi tiết của ví seller';
 
--- Dumping data for table handmade_shop.wallet_transactions: ~0 rows (approximately)
+-- Dumping data for table handmade_shop.wallet_transactions: ~2 rows (approximately)
 INSERT INTO `wallet_transactions` (`id`, `transaction_code`, `wallet_id`, `seller_id`, `order_id`, `order_detail_id`, `type`, `gross_amount`, `commission_percent`, `admin_fee`, `amount`, `balance_before`, `balance_after`, `note`, `status`, `created_at`) VALUES
-	(1, 'TXN-20260518-95388-40', 1, 18, 35, 40, 'commission', 55555.00, 10.00, 5555.50, 49999.50, 0.00, 49999.50, 'Nhận tiền từ sản phẩm #47 (đơn hàng #35)', 'completed', '2026-05-18 11:07:51');
+	(1, 'TXN-20260518-95388-40', 1, 18, 35, 40, 'commission', 55555.00, 10.00, 5555.50, 49999.50, 0.00, 49999.50, 'Nhận tiền từ sản phẩm #47 (đơn hàng #35)', 'completed', '2026-05-18 11:07:51'),
+	(2, 'TXN-20260520-92816-42', 2, 11, 37, 42, 'commission', 30000.00, 10.00, 3000.00, 27000.00, 0.00, 27000.00, 'Nhận tiền từ sản phẩm #50 (đơn hàng #37)', 'completed', '2026-05-20 17:08:23');
 
 -- Dumping structure for table handmade_shop.wishlist
 CREATE TABLE IF NOT EXISTS `wishlist` (
@@ -954,15 +985,15 @@ INSERT INTO `wishlist` (`id`, `user_id`, `product_id`, `created_at`) VALUES
 -- Dumping structure for table handmade_shop.withdrawal_requests
 CREATE TABLE IF NOT EXISTS `withdrawal_requests` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `request_code` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã yêu cầu VD: WDR-20240518-00001',
+  `request_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mã yêu cầu VD: WDR-20240518-00001',
   `seller_id` int NOT NULL COMMENT 'FK → user.id',
   `wallet_id` int NOT NULL COMMENT 'FK → seller_wallets.id',
   `amount` decimal(12,2) NOT NULL COMMENT 'Số tiền muốn rút',
-  `bank_name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên ngân hàng',
-  `bank_account` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Số tài khoản ngân hàng',
-  `bank_owner` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên chủ tài khoản',
-  `status` enum('pending','approved','rejected','processing','completed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `admin_note` text COLLATE utf8mb4_unicode_ci COMMENT 'Ghi chú của admin khi xử lý',
+  `bank_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên ngân hàng',
+  `bank_account` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Số tài khoản ngân hàng',
+  `bank_owner` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Tên chủ tài khoản',
+  `status` enum('pending','approved','rejected','processing','completed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `admin_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT 'Ghi chú của admin khi xử lý',
   `processed_at` datetime DEFAULT NULL COMMENT 'Thời điểm admin xử lý',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

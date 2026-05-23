@@ -361,9 +361,13 @@ class SellerController
         $shop = $this->shopModel->getBySellerId($userId);
 
         if (!$shop) {
-            $_SESSION['error_message'] = "Không tìm thấy thông tin shop.";
-            header('Location: ' . BASE_URL . 'index.php?url=Seller');
-            exit;
+            // Auto-create shop if not exists (for legacy sellers)
+            $this->shopModel->create([
+                'seller_id' => $userId,
+                'name' => $_SESSION['user_name'] . ' Shop',
+                'description' => 'Cửa hàng của ' . $_SESSION['user_name']
+            ]);
+            $shop = $this->shopModel->getBySellerId($userId);
         }
 
         // Check for pending updates
@@ -389,9 +393,8 @@ class SellerController
             // check if there's already a pending request
             $pending = $this->shopUpdateModel->getPendingByShopId($shop->id);
             if ($pending) {
-                $_SESSION['error_message'] = "Bạn đang có yêu cầu chờ duyệt, vui lòng đợi.";
-                header('Location: ' . BASE_URL . 'index.php?url=Seller/settings');
-                exit;
+                // If there's already a pending request, we will replace it (delete old, create new)
+                $this->shopUpdateModel->delete($pending->id);
             }
 
             $newName = $_POST['name'] ?? $shop->name;

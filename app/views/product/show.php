@@ -207,17 +207,23 @@ include 'app/views/shares/header.php';
                                 <div class="d-flex flex-wrap align-items-center" style="gap: 12px;" id="variantSelector">
                                     <?php if (!empty($variants)): ?>
                                         <?php foreach ($variants as $variant): ?>
-                                            <div class="variant-item p-1 border rounded d-flex align-items-center cursor-pointer position-relative"
+                                            <?php $hasVariantImage = !empty($variant->image) && $variant->image !== 'null'; ?>
+                                            <div class="variant-item p-1 border rounded d-flex align-items-center cursor-pointer position-relative <?php echo !$hasVariantImage ? 'justify-content-center px-3 py-2' : ''; ?>"
                                                 data-variant-id="<?php echo $variant->id; ?>"
                                                 data-variant-name="<?php echo htmlspecialchars($variant->name, ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-variant-image="<?php echo BASE_URL . 'public/uploads/' . $variant->image; ?>"
+                                                data-variant-image="<?php echo $hasVariantImage ? BASE_URL . 'public/uploads/' . $variant->image : ''; ?>"
                                                 data-variant-price="<?php echo $variant->price; ?>"
                                                 data-variant-stock="<?php echo $variant->stock; ?>"
-                                                style="min-width: 160px; transition: all 0.2s ease; border-color: #ddd !important; position: relative; <?php echo ($variant->stock <= 0) ? 'opacity: 0.6; grayscale(1);' : ''; ?>">
-                                                <img src="<?php echo BASE_URL . 'public/uploads/' . $variant->image; ?>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;" class="mr-2">
-                                                <div class="d-flex flex-column" style="overflow: hidden;">
-                                                    <span style="font-size: 1.05rem; font-weight: 600; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;"><?php echo htmlspecialchars($variant->name, ENT_QUOTES, 'UTF-8'); ?></span>
-                                                </div>
+                                                style="<?php echo $hasVariantImage ? 'min-width: 160px;' : 'min-width: 80px;'; ?> transition: all 0.2s ease; border-color: #ddd !important; position: relative; <?php echo ($variant->stock <= 0) ? 'opacity: 0.6; grayscale(1);' : ''; ?>">
+                                                
+                                                <?php if ($hasVariantImage): ?>
+                                                    <img src="<?php echo BASE_URL . 'public/uploads/' . $variant->image; ?>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;" class="mr-2">
+                                                    <div class="d-flex flex-column" style="overflow: hidden;">
+                                                        <span style="font-size: 1.05rem; font-weight: 600; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;"><?php echo htmlspecialchars($variant->name, ENT_QUOTES, 'UTF-8'); ?></span>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span style="font-size: 1.1rem; font-weight: 500; color: #333;"><?php echo htmlspecialchars($variant->name, ENT_QUOTES, 'UTF-8'); ?></span>
+                                                <?php endif; ?>
 
                                                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                                                     <a href="<?php echo BASE_URL; ?>index.php?url=Product/deleteVariant/<?php echo $variant->id; ?>" class="position-absolute text-danger" style="top: -8px; right: -8px; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 1px solid #ff4d4d; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="return confirm('Xóa mẫu này?')">
@@ -313,7 +319,14 @@ include 'app/views/shares/header.php';
                                     <i class="fas fa-trash-alt mr-2"></i> Xóa sản phẩm
                                 </a>
                             <?php else: ?>
-                                <?php if (((int)($product->stock ?? 0) > 0)): ?>
+                                <?php if (isset($product->status) && $product->status === 'pending'): ?>
+                                    <div class="alert alert-info w-100 p-3 shadow-sm" style="border-radius: 15px; border-left: 5px solid #17a2b8;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-info-circle fa-2x mr-3 text-info"></i>
+                                        
+                                        </div>
+                                    </div>
+                                <?php elseif (((int)($product->stock ?? 0) > 0)): ?>
                                     <a href="<?php echo BASE_URL; ?>index.php?url=Cart/add/<?php echo $product->id; ?>" id="btnAddToCartAjax" class="btn btn-outline-success px-4 py-3 shadow-sm flex-grow-1 text-center" style="border-radius: 30px; font-weight: bold; font-size: 1.3rem; white-space: nowrap; border-color: var(--primary-color); color: var(--primary-color);">
                                         <i class="fas fa-cart-plus mr-2"></i> Thêm vào giỏ hàng
                                     </a>
@@ -325,7 +338,7 @@ include 'app/views/shares/header.php';
                                 <?php else: ?>
                                     <div class="alert alert-danger w-100 p-3 shadow-sm" style="border-radius: 15px; border-left: 5px solid #dc3545;">
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-exclamation-circle fa-2x mr-3"></i>
+                                            <i class="fas fa-exclamation-circle fa-2x mr-3 text-danger"></i>
                                             <div style="font-size: 1.1rem; font-weight: 500;">
                                                 Hết hàng! Bạn có thể ghé lại sau hoặc chọn mẫu khác.
                                             </div>
@@ -342,9 +355,15 @@ include 'app/views/shares/header.php';
                                 <?php endif; ?>
                             <?php endif; ?>
 
-                            <a href="<?php echo BASE_URL; ?>index.php?url=Product/" class="btn btn-secondary px-4 py-3 shadow-sm text-center <?php echo (empty($canBuy)) ? 'flex-grow-1' : ''; ?>" style="border-radius: 30px; font-weight: 500; white-space: nowrap;">
-                                <i class="fas fa-arrow-left mr-2"></i> Tiếp tục mua sắm
-                            </a>
+                            <?php if (isset($product->status) && $product->status === 'pending' && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                <a href="<?php echo BASE_URL; ?>index.php?url=Dashboard/pendingProducts#row-<?php echo $product->id; ?>" class="btn btn-secondary px-4 py-3 shadow-sm text-center flex-grow-1" style="border-radius: 30px; font-weight: 500; white-space: nowrap;">
+                                    <i class="fas fa-arrow-left mr-2"></i> Quay lại danh sách chờ duyệt
+                                </a>
+                            <?php else: ?>
+                                <a href="<?php echo BASE_URL; ?>index.php?url=Product/" class="btn btn-secondary px-4 py-3 shadow-sm text-center <?php echo (empty($canBuy)) ? 'flex-grow-1' : ''; ?>" style="border-radius: 30px; font-weight: 500; white-space: nowrap;">
+                                    <i class="fas fa-arrow-left mr-2"></i> Tiếp tục mua sắm
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -596,9 +615,16 @@ include 'app/views/shares/header.php';
                 const vStock = parseInt(this.getAttribute('data-variant-stock') || 0);
                 const discount = <?php echo $discount ?? 0; ?>;
 
-                if (mainImage && newImg) {
-                    mainImage.src = newImg;
-                    mainImage.alt = vName;
+                if (mainImage) {
+                    if (!mainImage.hasAttribute('data-original-image')) {
+                        mainImage.setAttribute('data-original-image', mainImage.src);
+                    }
+                    if (newImg) {
+                        mainImage.src = newImg;
+                        mainImage.alt = vName;
+                    } else {
+                        mainImage.src = mainImage.getAttribute('data-original-image');
+                    }
                 }
 
                 // Update Price

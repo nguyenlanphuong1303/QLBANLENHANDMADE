@@ -42,7 +42,7 @@ $current_url = $current_url ?? ($_GET['url'] ?? 'Product/index');
         </div>
     <?php endif; ?>
 
-    <?php if (isset($_SESSION['error_message'])): ?>// cais
+    <?php if (isset($_SESSION['error_message'])): ?>
     <div class="alert alert-danger alert-dismissible fade show rounded-pill px-4 shadow-sm border-0" role="alert" style="background: #ffebee; color: #c62828; font-size: 14px;">
         <i class="fas fa-exclamation-circle mr-2"></i> <?php echo $_SESSION['error_message'];
                                                         unset($_SESSION['error_message']); ?>

@@ -170,6 +170,14 @@ include 'app/views/dashboard/header.php';
                 </div>
             <?php endif; ?>
 
+            <?php if (isset($product->status) && $product->status === 'rejected' && !empty($product->rejection_reason)): ?>
+                <div class="alert alert-warning mb-4 shadow-sm" style="border-radius: 10px; border-left: 5px solid #ff9800; background-color: #fff8e1;">
+                    <h5 class="alert-heading font-weight-bold" style="color: #f57c00;"><i class="fas fa-exclamation-circle mr-2"></i>Yêu cầu chỉnh sửa từ Admin</h5>
+                    <hr style="border-top-color: #ffe0b2;">
+                    <p class="mb-0" style="color: #424242; font-size: 1.05rem; white-space: pre-wrap;"><?php echo htmlspecialchars($product->rejection_reason, ENT_QUOTES, 'UTF-8'); ?></p>
+                </div>
+            <?php endif; ?>
+
             <form id="productForm" method="POST" action="<?php echo BASE_URL; ?>index.php?url=Product/update" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="<?php echo $product->id ?? ''; ?>">
 
@@ -321,12 +329,15 @@ include 'app/views/dashboard/header.php';
                     <input type="hidden" name="deleted_variant_ids" id="deleted_variant_ids" value="">
                 </div>
 
-                <div class="action-buttons">
+                <div class="action-buttons d-flex justify-content-end align-items-center" style="gap: 15px;">
+                    <button type="button" class="btn btn-outline-danger" style="border-radius: 8px; padding: 12px 24px; font-weight: 600; font-size: 18px; border-width: 2px;" onclick="if(confirm('Bạn có chắc chắn muốn xóa sạch tất cả thông tin đang nhập không?')) { document.getElementById('productForm').reset(); }">
+                        <i class="fas fa-trash-alt mr-2"></i>Xóa tất cả
+                    </button>
                     <a href="<?php echo BASE_URL; ?>index.php?url=<?php echo (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') ? 'Dashboard/products' : 'Product/myProducts'; ?>" class="btn-back-custom">
                         <i class="fas fa-arrow-left mr-2"></i>Quay lại
                     </a>
                     <button type="submit" class="btn-save-custom">
-                        <i class="fas fa-save mr-2"></i>Lưu thay đổi
+                        <i class="fas fa-paper-plane mr-2"></i>Gửi yêu cầu đăng sản phẩm
                     </button>
                 </div>
             </form>

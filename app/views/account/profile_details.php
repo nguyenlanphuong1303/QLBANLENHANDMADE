@@ -283,8 +283,8 @@ function updatePhone() {
     background: #d41d4e;
 }
 .avatar-preview-large {
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: 20px;
@@ -295,17 +295,18 @@ function updatePhone() {
     height: 100%;
     object-fit: cover;
 }
+
 .avatar-upload-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 150%;
 }
 #avatarUploadForm {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 150%;
 }
 .btn-select-image {
     background: #fff;

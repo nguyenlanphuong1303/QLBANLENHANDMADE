@@ -109,9 +109,33 @@ class DashboardController
         include 'app/views/dashboard/products.php';
     }
     
-    public function pendingProducts()
+    public function pendingProducts($subAction = null, $id = null)
     {
         $this->requireAdmin();
+        
+        if ($subAction === 'pin' && $id) {
+            $product = $this->productModel->getProductById($id);
+            if ($product) {
+                // Fetch variants to get min price if applicable
+                require_once 'app/models/VariantModel.php';
+                $variantModel = new VariantModel($this->db);
+                $variants = $variantModel->getVariantsByProductId($id);
+                
+                $minPrice = $product->price;
+                if (!empty($variants)) {
+                    foreach ($variants as $v) {
+                        if ($v->price > 0 && ($v->price < $minPrice || $minPrice == 0)) {
+                            $minPrice = $v->price;
+                        }
+                    }
+                }
+                
+                $action = 'pending_products';
+                include 'app/views/dashboard/pin.php';
+                return;
+            }
+        }
+
         $products = $this->productModel->getPendingProducts();
         $action = 'pending_products';
         include 'app/views/dashboard/pending_products.php';
@@ -123,6 +147,28 @@ class DashboardController
             $_SESSION['success_message'] = "Sản phẩm đã được phê duyệt!";
         } else {
             $_SESSION['error_message'] = "Lỗi khi phê duyệt sản phẩm.";
+        }
+        header('Location: ' . BASE_URL . 'index.php?url=Dashboard/pendingProducts');
+        exit;
+    }
+    public function requestEditProduct($id)
+    {
+        $this->requireAdmin();
+        $reason = $_POST['edit_request_note'] ?? null;
+        
+        $product = $this->productModel->getProductById($id);
+        
+        if ($product && $this->productModel->updateProductStatus($id, 'rejected', $reason)) {
+            // Gửi thông báo cho seller
+            require_once 'app/models/NotificationModel.php';
+            $notif = new NotificationModel($this->db);
+            $msg = "Sản phẩm '" . $product->name . "' cần được chỉnh sửa: " . $reason;
+            $link = "index.php?url=Product/edit/" . $id;
+            $notif->create($product->user_id, 'Yêu cầu chỉnh sửa sản phẩm', $msg, 'warning', $link);
+            
+            $_SESSION['success_message'] = "Đã gửi yêu cầu chỉnh sửa cho người bán.";
+        } else {
+            $_SESSION['error_message'] = "Lỗi khi gửi yêu cầu.";
         }
         header('Location: ' . BASE_URL . 'index.php?url=Dashboard/pendingProducts');
         exit;
@@ -557,20 +603,41 @@ class DashboardController
         if ($update && $update->status === 'pending') {
             $this->shopUpdateModel->updateStatus($id, 'rejected');
 
+            $reason = $_POST['rejection_reason'] ?? '';
+            $msg = 'Admin yêu cầu chỉnh sửa lại bản cập nhật thông tin Shop của bạn.';
+            if (!empty($reason)) {
+                $msg .= ' Nội dung chi tiết: ' . htmlspecialchars($reason);
+            }
+
             // Notify Seller
             require_once 'app/models/NotificationModel.php';
             $notif = new NotificationModel($this->db);
             $notif->create(
                 $update->seller_id,
-                'Cập nhật thông tin Shop bị từ chối',
-                'Yêu cầu cập nhật thông tin cửa hàng của bạn đã bị Admin từ chối.',
-                'danger',
+                'Yêu cầu chỉnh sửa thông tin Shop',
+                $msg,
+                'warning',
                 'index.php?url=Seller/settings'
             );
 
-            $_SESSION['success_message'] = "Đã từ chối yêu cầu cập nhật thông tin Shop.";
+            $_SESSION['success_message'] = "Đã gửi yêu cầu chỉnh sửa thông tin cho Shop.";
         } else {
             $_SESSION['error_message'] = "Yêu cầu không hợp lệ.";
+        }
+        header('Location: ' . BASE_URL . 'index.php?url=Dashboard/shopUpdates');
+        exit;
+    }
+
+    public function deleteShopUpdate($id)
+    {
+        $this->requireAdmin();
+        $update = $this->shopUpdateModel->getById($id);
+        
+        if ($update) {
+            $this->shopUpdateModel->delete($id);
+            $_SESSION['success_message'] = "Đã xóa yêu cầu cập nhật thông tin Shop.";
+        } else {
+            $_SESSION['error_message'] = "Yêu cầu không tồn tại.";
         }
         header('Location: ' . BASE_URL . 'index.php?url=Dashboard/shopUpdates');
         exit;

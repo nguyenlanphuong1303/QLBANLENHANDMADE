@@ -77,6 +77,58 @@ include 'app/views/dashboard/header.php';
     .custom-file-input {
         padding: 10px 0;
     }
+    .v-card {
+        width: 100px;
+        text-align: center;
+        border: 1px solid #e7e7e7;
+        border-radius: 6px;
+        background: #fff;
+        padding: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .v-card-img {
+        width: 88px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 4px;
+        position: relative;
+        background: #fafafa;
+        margin: 0 auto 6px;
+    }
+    .v-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .v-card-label { font-size: 13px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .v-placeholder {
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        border: 1px dashed #ccc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 12px;
+        background: #fff;
+    }
+    .v-preview-container { position: relative; }
+    .v-remove-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #fff;
+        border-radius: 50%;
+        border: 1px solid #f5c6cb;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d9534f;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
 
     .btn-save-custom {
         background-color: #75c794;
@@ -192,19 +244,8 @@ include 'app/views/dashboard/header.php';
                             <input type="number" id="stock" name="stock" class="form-control custom-input" value="<?php echo htmlspecialchars($_POST['stock'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>" min="0">
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="custom-form-group">
-                            <label for="sold" class="custom-label">Đã bán:</label>
-                            <input type="number" id="sold" name="sold" class="form-control custom-input" value="<?php echo htmlspecialchars($_POST['sold'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>" min="0">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="custom-form-group">
-                            <label for="rating" class="custom-label">Đánh giá (0-5):</label>
-                            <input type="number" id="rating" name="rating" class="form-control custom-input" value="<?php echo htmlspecialchars($_POST['rating'] ?? '5', ENT_QUOTES, 'UTF-8'); ?>" step="0.1" min="0" max="5">
-                        </div>
-                    </div>
                 </div>
+    
 
                 <div class="custom-form-group">
                     <label for="category_id" class="custom-label">Danh mục:</label>
@@ -257,12 +298,15 @@ include 'app/views/dashboard/header.php';
                     </div>
                 </div>
 
-                <div class="action-buttons">
+                <div class="action-buttons d-flex justify-content-end align-items-center" style="gap: 15px;">
+                    <button type="button" class="btn btn-outline-danger" style="border-radius: 8px; padding: 12px 24px; font-weight: 600; font-size: 18px; border-width: 2px;" onclick="if(confirm('Bạn có chắc chắn muốn xóa sạch tất cả thông tin đang nhập không?')) { document.getElementById('productForm').reset(); }">
+                        <i class="fas fa-trash-alt mr-2"></i>Xóa tất cả
+                    </button>
                     <a href="<?php echo BASE_URL; ?>index.php?url=<?php echo (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') ? 'Dashboard/products' : 'Product/myProducts'; ?>" class="btn-back-custom">
                         <i class="fas fa-arrow-left mr-2"></i>Quay lại
                     </a>
                     <button type="submit" class="btn-save-custom">
-                        <i class="fas fa-plus mr-2"></i>Thêm Sản Phẩm
+                        <i class="fas fa-paper-plane mr-2"></i>Gửi yêu cầu đăng sản phẩm
                     </button>
                 </div>
 
@@ -369,33 +413,67 @@ include 'app/views/dashboard/header.php';
                 <div class="col-md-4 mb-2">
                     <label class="small font-weight-bold ml-1"><i class="fas fa-image mr-1"></i>Ảnh mẫu:</label>
                     <div class="d-flex align-items-center">
-                        <div id="v-preview-container-${rowId}" class="mr-2" style="display: none;">
-                            <img id="v-preview-${rowId}" src="" style="width: 38px; height: 38px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        <div id="v-card-${rowId}" class="v-card mr-2">
+                            <div class="v-card-img">
+                                <div id="v-placeholder-${rowId}" class="v-placeholder">No</div>
+                                <img id="v-preview-${rowId}" src="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:4px; border:1px solid #ddd;">
+                                <button type="button" id="v-remove-${rowId}" class="v-remove-btn" title="Xóa ảnh" style="display:none;" onclick="clearVariantImage('${rowId}')"><i class="fas fa-times" style="font-size:12px;"></i></button>
+                            </div>
+                            <div id="v-card-label-${rowId}" class="v-card-label">Mẫu</div>
                         </div>
-                        <input type="file" name="variant_images[]" class="form-control-file" style="font-size: 13px;" accept="image/*" required onchange="previewVariantImage(this, '${rowId}')">
+                        <input type="file" id="v-input-${rowId}" name="variant_images[]" class="form-control-file variant-image-input" style="font-size: 13px;" accept="image/*" onchange="previewVariantImage(this, '${rowId}')">
                     </div>
                 </div>
             </div>
         </div>
     `;
         container.insertAdjacentHTML('beforeend', rowHtml);
+        // Attach name -> label binding for the new row
+        const nameInput = document.querySelector(`#variant-row-${rowId} input[name="variant_names[]"]`);
+        const cardLabel = document.getElementById(`v-card-label-${rowId}`);
+        if (nameInput && cardLabel) {
+            const updateLabel = () => { cardLabel.textContent = nameInput.value || 'Mẫu'; };
+            nameInput.addEventListener('input', updateLabel);
+            updateLabel();
+        }
     }
 
     // Chức năng preview ảnh cho variant
     function previewVariantImage(input, rowId) {
-        const previewContainer = document.getElementById('v-preview-container-' + rowId);
         const previewImg = document.getElementById('v-preview-' + rowId);
+        const placeholder = document.getElementById('v-placeholder-' + rowId);
+        const removeBtn = document.getElementById('v-remove-' + rowId);
 
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                previewContainer.style.display = 'block';
+                if (previewImg) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                }
+                if (placeholder) placeholder.style.display = 'none';
+                if (removeBtn) removeBtn.style.display = 'flex';
             }
             reader.readAsDataURL(input.files[0]);
         } else {
-            previewContainer.style.display = 'none';
+            if (previewImg) previewImg.style.display = 'none';
+            if (placeholder) placeholder.style.display = 'inline-flex';
+            if (removeBtn) removeBtn.style.display = 'none';
         }
+    }
+
+    function clearVariantImage(rowId) {
+        const input = document.getElementById('v-input-' + rowId);
+        const previewImg = document.getElementById('v-preview-' + rowId);
+        const placeholder = document.getElementById('v-placeholder-' + rowId);
+        const removeBtn = document.getElementById('v-remove-' + rowId);
+        if (input) input.value = '';
+        if (previewImg) {
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+        }
+        if (removeBtn) removeBtn.style.display = 'none';
+        if (placeholder) placeholder.style.display = 'inline-flex';
     }
 
     function removeVariantRow(rowId) {

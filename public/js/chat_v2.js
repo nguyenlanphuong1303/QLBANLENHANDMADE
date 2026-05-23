@@ -580,6 +580,25 @@
             badge.classList.toggle('show', n > 0);
         }
     }
+//cậpn nhật số lượng tin nhắn chưa đọc
+    function loadUnreadMessages() {
+        if (!badge) return;
+        fetch(BASE_URL + 'index.php?url=Chat/conversations')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) return;
+                const totalUnread = (data.conversations || []).reduce((sum, conv) => sum + (conv.unread || 0), 0);
+                updateBubbleBadge(totalUnread);
+            })
+            .catch(() => {
+                // Ignore polling errors silently
+            });
+    }
+
+    if (badge) {
+        loadUnreadMessages();
+        setInterval(loadUnreadMessages, 3000);
+    }
 
     /* ── Global: open chat from product/order page ───────────── */
     document.addEventListener('click', function (e) {
