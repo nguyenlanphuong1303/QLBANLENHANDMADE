@@ -160,7 +160,7 @@ $current_url = $current_url ?? ($_GET['url'] ?? 'Product/index');
         ],
         [
             'id' => 'flowers',
-            'title' => 'HOA LEN NGHỆ THUẬT',
+            'title' => 'MÓC KHÓA HANDMADE',
             'icon' => 'fas fa-seedling',
             'class' => 'flowers',
             'view_more_link' => BASE_URL . 'index.php?url=Product/group/flowers',
@@ -169,7 +169,7 @@ $current_url = $current_url ?? ($_GET['url'] ?? 'Product/index');
             'products' => $flowersProducts ?? [],
             'benefits' => ['Hoa bền vĩnh cửu', 'Màu sắc rực rỡ', 'Quà tặng ý nghĩa', 'Đóng gói cẩn thận', 'Freeship đơn lớn'],
             'promo_title' => 'QUÀ TẶNG Ý NGHĨA',
-            'promo_main' => 'BÓ HOA<br>LEN ĐẸP'
+            'promo_main' => 'MÓC KHÓA<br>SIÊU DỄ THƯƠNG'
         ],
         [
             'id' => 'yarn',

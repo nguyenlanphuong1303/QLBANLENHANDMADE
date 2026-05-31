@@ -86,51 +86,8 @@ if (!isset($user) || empty($user)) {
                 </a>
             </li>
         <?php endif; ?>
-
-        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'user'): ?>
-            <li class="sidebar-menu-item mt-2">
-                <button id="btnRequestPermission" class="btn-request-permission">
-                    Yêu cầu phân quyền
-                </button>
-            </li>
-        <?php endif; ?>
     </ul>
 </aside>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const btnRequest = document.getElementById('btnRequestPermission');
-        if (btnRequest) {
-            btnRequest.addEventListener('click', function() {
-                if (confirm('Bạn có chắc chắn muốn gửi yêu cầu trở thành người bán (Seller) không?')) {
-                    btnRequest.disabled = true;
-                    btnRequest.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
-
-                    fetch('<?php echo BASE_URL; ?>index.php?url=Seller/quickRequestPermission')
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert(data.message);
-                                btnRequest.innerHTML = '<i class="fas fa-check"></i> Đã gửi yêu cầu';
-                                btnRequest.style.background = '#d1e7dd';
-                                btnRequest.style.color = '#0f5132';
-                            } else {
-                                alert(data.message);
-                                btnRequest.disabled = false;
-                                btnRequest.innerHTML = 'Yêu cầu phân quyền';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi xảy ra kết nối tới hệ thống.');
-                            btnRequest.disabled = false;
-                            btnRequest.innerHTML = 'Yêu cầu phân quyền';
-                        });
-                }
-            });
-        }
-    });
-</script>
 
 <style>
     .sidebar-submenu {
